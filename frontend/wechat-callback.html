@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>微信登录回调</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: white;
+        }
+        
+        .callback-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .loading {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        h2 {
+            margin-bottom: 20px;
+        }
+        
+        p {
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+    <div class="callback-container">
+        <h2>微信登录处理中</h2>
+        <div class="loading"></div>
+        <p>正在处理微信登录，请稍候...</p>
+    </div>
+
+    <script>
+        // 获取URL参数
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        }
+
+        // 页面加载完成后处理
+        document.addEventListener('DOMContentLoaded', function() {
+            const code = getUrlParameter('code');
+            const state = getUrlParameter('state');
+            
+            if (code) {
+                // 向父窗口发送消息
+                if (window.opener) {
+                    window.opener.postMessage({
+                        type: 'wechat_login_success',
+                        code: code,
+                        state: state
+                    }, window.location.origin);
+                    
+                    // 显示成功消息
+                    document.querySelector('.callback-container').innerHTML = `
+                        <h2>登录成功</h2>
+                        <p>微信登录已成功，正在跳转...</p>
+                    `;
+                    
+                    // 延迟关闭窗口
+                    setTimeout(() => {
+                        window.close();
+                    }, 2000);
+                } else {
+                    // 如果没有父窗口，显示错误
+                    document.querySelector('.callback-container').innerHTML = `
+                        <h2>登录失败</h2>
+                        <p>无法找到主窗口，请重新尝试登录。</p>
+                    `;
+                }
+            } else {
+                // 没有授权码，显示错误
+                document.querySelector('.callback-container').innerHTML = `
+                    <h2>登录失败</h2>
+                    <p>未获取到微信授权码，请重新尝试登录。</p>
+                `;
+            }
+        });
+    </script>
+</body>
+</html> 

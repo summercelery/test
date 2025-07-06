@@ -1,0 +1,34 @@
+# IDE文件
+.idea/
+.vscode/
+*.iml
+
+# 构建输出
+target/
+build/
+
+# 日志文件
+*.log
+
+# 临时文件
+*.tmp
+*.temp
+
+# 系统文件
+.DS_Store
+Thumbs.db
+
+# Git文件
+.git/
+.gitignore
+
+# 前端文件（后端Dockerfile不需要）
+frontend/
+
+# 文档文件
+README.md
+*.md
+
+# 其他配置文件
+postman_collection.json
+docker-compose.yml 
