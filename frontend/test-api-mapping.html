@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API映射关系测试</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-network-wired"></i> API映射关系测试</h3>
+                        <p class="text-muted mb-0">测试前端API请求与后端Controller的完整对应关系</p>
+                    </div>
+                    <div class="card-body">
+                        <!-- 测试结果统计 -->
+                        <div class="row mb-4">
+                            <div class="col-md-3">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-list-ul fa-2x"></i>
+                                        <h4 id="totalTests" class="mt-2">0</h4>
+                                        <p class="mb-0">总测试数</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-check-circle fa-2x"></i>
+                                        <h4 id="successTests" class="mt-2">0</h4>
+                                        <p class="mb-0">成功</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-danger text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-times-circle fa-2x"></i>
+                                        <h4 id="failedTests" class="mt-2">0</h4>
+                                        <p class="mb-0">失败</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body text-center">
+                                        <i class="fas fa-exclamation-triangle fa-2x"></i>
+                                        <h4 id="warningTests" class="mt-2">0</h4>
+                                        <p class="mb-0">警告</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 测试控制 -->
+                        <div class="mb-4">
+                            <button class="btn btn-primary" onclick="testAllAPIs()">
+                                <i class="fas fa-play"></i> 测试所有API
+                            </button>
+                            <button class="btn btn-secondary" onclick="clearResults()">
+                                <i class="fas fa-broom"></i> 清空结果
+                            </button>
+                        </div>
+                        
+                        <!-- 测试结果展示 -->
+                        <div id="testResults" class="row"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // API映射定义
+        const API_MAPPINGS = [
+            {
+                name: '用户资料',
+                frontend: 'GET /user/profile',
+                backend: 'UserController.getProfile()',
+                url: '/user/profile',
+                requireAuth: true,
+                description: '获取当前用户资料'
+            },
+            {
+                name: '用户统计',
+                frontend: 'GET /user/stats',
+                backend: 'UserController.getUserStats()',
+                url: '/user/stats',
+                requireAuth: true,
+                description: '获取用户统计数据'
+            },
+            {
+                name: 'Token验证',
+                frontend: 'GET /auth/validate',
+                backend: 'AuthController.validateToken()',
+                url: '/auth/validate',
+                requireAuth: true,
+                description: '验证Token有效性'
+            },
+            {
+                name: '联系人列表',
+                frontend: 'GET /contacts',
+                backend: 'ContactController.getContacts()',
+                url: '/contacts',
+                requireAuth: true,
+                description: '获取联系人列表(分页)'
+            },
+            {
+                name: '所有联系人',
+                frontend: 'GET /contacts/all',
+                backend: 'ContactController.getAllContacts()',
+                url: '/contacts/all',
+                requireAuth: true,
+                description: '获取所有联系人(不分页)'
+            },
+            {
+                name: '标签列表',
+                frontend: 'GET /tags',
+                backend: 'TagController.getTags()',
+                url: '/tags',
+                requireAuth: true,
+                description: '获取标签列表'
+            },
+            {
+                name: '提醒列表',
+                frontend: 'GET /reminders',
+                backend: 'ReminderController.getReminders()',
+                url: '/reminders',
+                requireAuth: true,
+                description: '获取提醒列表(分页)'
+            }
+        ];
+
+        // 初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 API映射关系测试页面初始化');
+            AppState.init();
+            
+            // 显示API映射信息
+            displayAPIMapping();
+        });
+
+        // 显示API映射信息
+        function displayAPIMapping() {
+            const resultsDiv = document.getElementById('testResults');
+            
+            let html = '';
+            API_MAPPINGS.forEach((mapping, index) => {
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="card h-100" id="card-${index}">
+                            <div class="card-header d-flex justify-content-between align-items-center">
+                                <h6 class="mb-0">${mapping.name}</h6>
+                                <span class="badge bg-secondary" id="status-${index}">待测试</span>
+                            </div>
+                            <div class="card-body">
+                                <div class="small text-muted">
+                                    <div><strong>前端:</strong> ${mapping.frontend}</div>
+                                    <div><strong>后端:</strong> ${mapping.backend}</div>
+                                    <div><strong>URL:</strong> ${mapping.url}</div>
+                                    <div><strong>需要认证:</strong> ${mapping.requireAuth ? '是' : '否'}</div>
+                                    <div><strong>描述:</strong> ${mapping.description}</div>
+                                </div>
+                                <div class="mt-3">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="testSingleAPI(${index})">
+                                        <i class="fas fa-play"></i> 单独测试
+                                    </button>
+                                </div>
+                                <div class="mt-2" id="result-${index}"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            resultsDiv.innerHTML = html;
+        }
+
+        // 测试所有API
+        async function testAllAPIs() {
+            console.log('🧪 开始测试所有API...');
+            
+            let totalTests = 0;
+            let successTests = 0;
+            let failedTests = 0;
+            let warningTests = 0;
+            
+            for (let i = 0; i < API_MAPPINGS.length; i++) {
+                const result = await testSingleAPI(i);
+                totalTests++;
+                
+                if (result.success) {
+                    successTests++;
+                } else if (result.warning) {
+                    warningTests++;
+                } else {
+                    failedTests++;
+                }
+            }
+            
+            // 更新统计
+            document.getElementById('totalTests').textContent = totalTests;
+            document.getElementById('successTests').textContent = successTests;
+            document.getElementById('failedTests').textContent = failedTests;
+            document.getElementById('warningTests').textContent = warningTests;
+            
+            console.log('🎉 测试完成！');
+        }
+
+        // 测试单个API
+        async function testSingleAPI(index) {
+            const mapping = API_MAPPINGS[index];
+            const statusElement = document.getElementById(`status-${index}`);
+            const resultElement = document.getElementById(`result-${index}`);
+            const cardElement = document.getElementById(`card-${index}`);
+            
+            // 设置测试中状态
+            statusElement.textContent = '测试中...';
+            statusElement.className = 'badge bg-warning';
+            
+            try {
+                console.log(`🧪 测试 ${mapping.name}: ${mapping.url}`);
+                
+                const startTime = Date.now();
+                const { response, data } = await API.get(mapping.url);
+                const duration = Date.now() - startTime;
+                
+                // 分析结果
+                const result = analyzeAPIResponse(response, data, duration);
+                
+                // 更新状态
+                if (result.success) {
+                    statusElement.textContent = '✅ 成功';
+                    statusElement.className = 'badge bg-success';
+                    cardElement.className = 'card h-100 border-success';
+                } else if (result.warning) {
+                    statusElement.textContent = '⚠️ 警告';
+                    statusElement.className = 'badge bg-warning';
+                    cardElement.className = 'card h-100 border-warning';
+                } else {
+                    statusElement.textContent = '❌ 失败';
+                    statusElement.className = 'badge bg-danger';
+                    cardElement.className = 'card h-100 border-danger';
+                }
+                
+                // 显示详细结果
+                resultElement.innerHTML = `
+                    <div class="small">
+                        <div><strong>状态码:</strong> ${response.status}</div>
+                        <div><strong>响应时间:</strong> ${duration}ms</div>
+                        <div><strong>数据类型:</strong> ${result.dataType}</div>
+                        <div><strong>数据量:</strong> ${result.dataCount}</div>
+                        ${result.error ? `<div class="text-danger"><strong>错误:</strong> ${result.error}</div>` : ''}
+                        ${result.warning ? `<div class="text-warning"><strong>警告:</strong> ${result.warning}</div>` : ''}
+                    </div>
+                `;
+                
+                return result;
+                
+            } catch (error) {
+                console.error(`❌ 测试失败 ${mapping.name}:`, error);
+                
+                // 更新状态
+                statusElement.textContent = '❌ 失败';
+                statusElement.className = 'badge bg-danger';
+                cardElement.className = 'card h-100 border-danger';
+                
+                resultElement.innerHTML = `
+                    <div class="small text-danger">
+                        <strong>错误:</strong> ${error.message}
+                    </div>
+                `;
+                
+                return { success: false, error: error.message };
+            }
+        }
+
+        // 分析API响应
+        function analyzeAPIResponse(response, data, duration) {
+            const result = {
+                success: false,
+                warning: false,
+                error: null,
+                dataType: typeof data,
+                dataCount: 0
+            };
+            
+            // 检查HTTP状态码
+            if (response.status !== 200) {
+                result.error = `HTTP状态码: ${response.status}`;
+                return result;
+            }
+            
+            // 检查数据格式
+            if (data && typeof data === 'object') {
+                if (data.success === true) {
+                    result.success = true;
+                    result.dataType = 'ApiResponse格式';
+                    
+                    // 计算数据量
+                    if (Array.isArray(data.data)) {
+                        result.dataCount = data.data.length;
+                    } else if (data.data && typeof data.data === 'object') {
+                        result.dataCount = Object.keys(data.data).length;
+                    } else {
+                        result.dataCount = data.data ? 1 : 0;
+                    }
+                    
+                    // 检查是否为空数据
+                    if (result.dataCount === 0) {
+                        result.warning = '返回空数据';
+                    }
+                } else if (data.success === false) {
+                    result.error = data.message || '后端业务逻辑错误';
+                } else {
+                    result.warning = '非标准ApiResponse格式';
+                    result.success = true; // 能响应就算成功
+                }
+            } else {
+                result.error = '响应数据格式异常';
+            }
+            
+            return result;
+        }
+
+        // 清空结果
+        function clearResults() {
+            displayAPIMapping();
+            document.getElementById('totalTests').textContent = '0';
+            document.getElementById('successTests').textContent = '0';
+            document.getElementById('failedTests').textContent = '0';
+            document.getElementById('warningTests').textContent = '0';
+        }
+    </script>
+</body>
+</html> 

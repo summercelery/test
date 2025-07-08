@@ -17,33 +17,113 @@ USE `user_auth_system`;
 -- 删除已存在的表（如果存在）
 -- =====================================================
 DROP TABLE IF EXISTS `users`;
+DROP TABLE IF EXISTS `reminders`;
+DROP TABLE IF EXISTS `reminder_recipients`;
+DROP TABLE IF EXISTS `contacts`;
+DROP TABLE IF EXISTS `tags`;
+DROP TABLE IF EXISTS `contact_tags`;
 
 -- =====================================================
 -- 创建用户表
 -- =====================================================
-CREATE TABLE `users` (
-    `id` BIGINT AUTO_INCREMENT PRIMARY KEY COMMENT '用户ID，自增主键',
-    `username` VARCHAR(50) NOT NULL UNIQUE COMMENT '用户名，唯一',
-    `password` VARCHAR(255) NOT NULL COMMENT '密码，BCrypt加密',
-    `email` VARCHAR(100) NOT NULL UNIQUE COMMENT '邮箱地址，唯一',
-    `full_name` VARCHAR(100) COMMENT '用户全名',
-    `phone_number` VARCHAR(20) COMMENT '手机号码',
-    `role` ENUM('USER', 'ADMIN') NOT NULL DEFAULT 'USER' COMMENT '用户角色：USER普通用户，ADMIN管理员',
-    `enabled` BOOLEAN NOT NULL DEFAULT TRUE COMMENT '账户是否启用',
-    `account_non_expired` BOOLEAN NOT NULL DEFAULT TRUE COMMENT '账户是否未过期',
-    `account_non_locked` BOOLEAN NOT NULL DEFAULT TRUE COMMENT '账户是否未锁定',
-    `credentials_non_expired` BOOLEAN NOT NULL DEFAULT TRUE COMMENT '凭据是否未过期',
-    `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    
-    -- 索引
-    INDEX `idx_username` (`username`),
-    INDEX `idx_email` (`email`),
-    INDEX `idx_phone_number` (`phone_number`),
-    INDEX `idx_role` (`role`),
-    INDEX `idx_enabled` (`enabled`),
-    INDEX `idx_created_at` (`created_at`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
+CREATE TABLE IF NOT EXISTS users (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    full_name VARCHAR(255),
+    phone_number VARCHAR(20),
+    wechat_openid VARCHAR(100) UNIQUE,
+    wechat_unionid VARCHAR(100) UNIQUE,
+    role ENUM('USER', 'ADMIN') DEFAULT 'USER',
+    enabled BOOLEAN DEFAULT TRUE,
+    account_non_expired BOOLEAN DEFAULT TRUE,
+    account_non_locked BOOLEAN DEFAULT TRUE,
+    credentials_non_expired BOOLEAN DEFAULT TRUE,
+    created_at DATETIME,
+    updated_at DATETIME
+);
+
+-- =====================================================
+-- 创建提醒表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS reminders (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    title VARCHAR(200) NOT NULL,
+    content TEXT,
+    reminder_time DATETIME NOT NULL,
+    reminder_types JSON NOT NULL,
+    status ENUM('PENDING', 'SENT', 'FAILED', 'CANCELLED') DEFAULT 'PENDING',
+    repeat_type ENUM('NONE', 'DAILY', 'WEEKLY', 'MONTHLY', 'YEARLY', 'CUSTOM') DEFAULT 'NONE',
+    repeat_interval INT DEFAULT 1,
+    repeat_end_time DATETIME,
+    created_at DATETIME NOT NULL,
+    updated_at DATETIME,
+    last_sent_time DATETIME,
+    sent_count INT DEFAULT 0,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 创建提醒接收者表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS reminder_recipients (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    reminder_id BIGINT NOT NULL,
+    recipient_type ENUM('PHONE', 'WECHAT') NOT NULL,
+    recipient_value VARCHAR(100) NOT NULL,
+    name VARCHAR(50),
+    phone_number VARCHAR(20),
+    wechat_openid VARCHAR(100),
+    email VARCHAR(100),
+    relationship VARCHAR(50),
+    is_registered_user BOOLEAN DEFAULT FALSE,
+    user_id BIGINT,
+    status ENUM('ACTIVE', 'INACTIVE', 'DELETED') DEFAULT 'ACTIVE',
+    last_sent_time DATETIME,
+    sent_count INT DEFAULT 0,
+    created_at DATETIME NOT NULL,
+    FOREIGN KEY (reminder_id) REFERENCES reminders(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 创建提醒人表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS contacts (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(100) NOT NULL,
+    phone_number VARCHAR(20),
+    wechat_openid VARCHAR(100),
+    created_at DATETIME,
+    updated_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 创建标签表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS tags (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    name VARCHAR(50) NOT NULL,
+    color VARCHAR(7) DEFAULT '#007bff',
+    created_at DATETIME,
+    updated_at DATETIME,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- =====================================================
+-- 创建联系人标签关联表
+-- =====================================================
+CREATE TABLE IF NOT EXISTS contact_tags (
+    contact_id BIGINT NOT NULL,
+    tag_id BIGINT NOT NULL,
+    PRIMARY KEY (contact_id, tag_id),
+    FOREIGN KEY (contact_id) REFERENCES contacts(id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE
+);
 
 -- =====================================================
 -- 插入测试数据

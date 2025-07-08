@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户登录 - 用户认证系统</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="style.css" rel="stylesheet">
+    <link href="styles.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --shadow-light: 0 5px 15px rgba(0, 0, 0, 0.1);
+            --shadow-medium: 0 10px 30px rgba(0, 0, 0, 0.15);
+            --shadow-heavy: 0 20px 40px rgba(0, 0, 0, 0.2);
+            --border-radius: 15px;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background: var(--primary-gradient);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow-heavy);
+            overflow: hidden;
+            width: 100%;
+            max-width: 420px;
+            animation: slideInUp 0.6s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .login-header {
+            background: var(--primary-gradient);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .login-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 700;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-header p {
+            margin: 0.5rem 0 0 0;
+            opacity: 0.9;
+            font-size: 0.95rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .login-body {
+            padding: 2.5rem 2rem;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 2rem;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+            background: #f8f9fa;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #6c757d;
+            position: relative;
+        }
+
+        .login-tab.active {
+            background: #007bff;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+        }
+
+        .login-tab:hover:not(.active) {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        .login-tab i {
+            margin-right: 0.5rem;
+        }
+
+        .login-form {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .login-form.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: stretch;
+        }
+
+        .input-group-text {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-right: none;
+            color: #6c757d;
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius) 0 0 var(--border-radius);
+            transition: var(--transition);
+        }
+
+        .form-control {
+            border: 2px solid #dee2e6;
+            border-left: none;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: var(--transition);
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+
+        .form-control:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        .form-control:focus + .input-group-text,
+        .input-group:focus-within .input-group-text {
+            border-color: #007bff;
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 0.875rem;
+            font-size: 1rem;
+            font-weight: 600;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+            border: none;
+            background: var(--primary-gradient);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-login::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-login:hover::before {
+            left: 100%;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 123, 255, 0.4);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-login.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .btn-text, .btn-loading {
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-loading {
+            display: none;
+        }
+
+        .btn-loading.show {
+            display: inline-block;
+        }
+
+        .other-login-options {
+            margin-top: 2rem;
+            text-align: center;
+        }
+
+        .other-login-title {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            position: relative;
+            font-weight: 500;
+        }
+
+        .other-login-title::before,
+        .other-login-title::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 35%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, #dee2e6, transparent);
+        }
+
+        .other-login-title::before {
+            left: 0;
+        }
+
+        .other-login-title::after {
+            right: 0;
+        }
+
+        .other-login-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .other-login-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            padding: 0.875rem 1.5rem;
+            border: 2px solid #dee2e6;
+            border-radius: var(--border-radius);
+            background: white;
+            color: #333;
+            text-decoration: none;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .other-login-btn:hover {
+            background: #f8f9fa;
+            border-color: #adb5bd;
+            color: #333;
+            text-decoration: none;
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-light);
+        }
+
+        .other-login-btn.wechat {
+            background: #07c160;
+            color: white;
+            border-color: #07c160;
+        }
+
+        .other-login-btn.wechat:hover {
+            background: #06ad56;
+            border-color: #06ad56;
+            color: white;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .login-footer p {
+            margin-bottom: 0.5rem;
+            color: #6c757d;
+        }
+
+        .login-footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .login-footer a:hover {
+            color: #0056b3;
+            text-decoration: underline;
+        }
+
+        .send-code-btn {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            white-space: nowrap;
+            font-weight: 600;
+        }
+
+        /* 密码显示/隐藏按钮 */
+        .password-toggle {
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            color: #6c757d;
+            transition: var(--transition);
+        }
+
+        .password-toggle:hover {
+            background: #e9ecef;
+            color: #495057;
+        }
+
+        /* 表单验证样式 */
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .form-control.is-valid {
+            border-color: #28a745;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .invalid-feedback i {
+            margin-right: 0.25rem;
+        }
+
+        /* 密码强度指示器 */
+        .password-strength {
+            margin-top: 0.5rem;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 0.25rem;
+        }
+
+        .strength-fill {
+            height: 100%;
+            transition: var(--transition);
+        }
+
+        .strength-fill.strength-weak {
+            width: 33%;
+            background: #dc3545;
+        }
+
+        .strength-fill.strength-medium {
+            width: 66%;
+            background: #ffc107;
+        }
+
+        .strength-fill.strength-strong {
+            width: 100%;
+            background: #28a745;
+        }
+
+        .strength-text {
+            font-size: 0.75rem;
+            color: #6c757d;
+            font-weight: 500;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .login-container {
+                border-radius: var(--border-radius);
+            }
+
+            .login-header {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-header h1 {
+                font-size: 1.5rem;
+            }
+
+            .login-body {
+                padding: 2rem 1.5rem;
+            }
+
+            .login-tab {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.8rem;
+            }
+
+            .form-control, .input-group-text {
+                padding: 0.625rem 0.75rem;
+            }
+
+            .btn-login {
+                padding: 0.75rem;
+            }
+        }
+
+        /* 消息提示样式 */
+        .message-container {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .message-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: var(--border-radius);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-medium);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 400px;
+            pointer-events: auto;
+            animation: slideInDown 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .message-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .message-icon.success { color: #28a745; }
+        .message-icon.error { color: #dc3545; }
+        .message-icon.warning { color: #ffc107; }
+        .message-icon.info { color: #17a2b8; }
+
+        .message-content {
+            flex: 1;
+        }
+
+        .message-title {
+            font-weight: 600;
+            margin: 0 0 0.25rem 0;
+            font-size: 1rem;
+        }
+
+        .message-text {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .message-close {
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            padding: 0.25rem;
+            border-radius: 50%;
+            transition: var(--transition);
+            flex-shrink: 0;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .message-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+            color: #666;
+        }
+
+        @keyframes slideInDown {
+            from {
+                transform: translateX(-50%) translateY(-100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(-50%) translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .loading-spinner {
+            background: white;
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .loading-spinner .spinner-border {
+            width: 3rem;
+            height: 3rem;
+            color: #007bff;
+        }
+
+        /* 模态框样式改进 */
+        .modal-content {
+            border-radius: var(--border-radius);
+            border: none;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid #e9ecef;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .modal-footer {
+            border-top: 1px solid #e9ecef;
+            padding: 1.5rem 2rem;
+        }
+
+        .modal-title {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* 复选框样式改进 */
+        .form-check {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+
+        .form-check-input {
+            margin-top: 0.25rem;
+        }
+
+        .form-check-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            line-height: 1.4;
+        }
+
+        .form-check-label a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .form-check-label a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-header">
+            <h1><i class="fas fa-shield-alt"></i> 用户认证系统</h1>
+            <p>安全、便捷的用户登录体验</p>
+        </div>
+        
+        <div class="login-body">
+            <!-- 登录方式切换 -->
+            <div class="login-tabs">
+                <button class="login-tab active" onclick="switchLoginTab('password')">
+                    <i class="fas fa-lock"></i> 密码登录
+                </button>
+                <button class="login-tab" onclick="switchLoginTab('sms')">
+                    <i class="fas fa-mobile-alt"></i> 验证码登录
+                </button>
+            </div>
+            
+            <!-- 密码登录表单 -->
+            <form id="passwordLoginForm" class="login-form active">
+                <div class="form-group">
+                    <label for="loginPhone" class="form-label">手机号</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-mobile-alt"></i>
+                        </span>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="loginPhone" 
+                               placeholder="请输入11位手机号"
+                               autocomplete="tel"
+                               required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="loginPassword" class="form-label">密码</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                        <input type="password" 
+                               class="form-control" 
+                               id="loginPassword" 
+                               placeholder="请输入密码"
+                               autocomplete="current-password"
+                               required>
+                        <button type="button" class="btn password-toggle" onclick="togglePassword('loginPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn-login">
+                    <span class="btn-text">登录</span>
+                    <span class="btn-loading">
+                        <i class="fas fa-spinner fa-spin"></i> 登录中...
+                    </span>
+                </button>
+            </form>
+            
+            <!-- 验证码登录表单 -->
+            <form id="smsLoginForm" class="login-form">
+                <div class="form-group">
+                    <label for="smsLoginPhone" class="form-label">手机号</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-mobile-alt"></i>
+                        </span>
+                        <input type="tel" 
+                               class="form-control" 
+                               id="smsLoginPhone" 
+                               placeholder="请输入11位手机号"
+                               autocomplete="tel"
+                               required>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="smsLoginCode" class="form-label">验证码</label>
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-key"></i>
+                        </span>
+                        <input type="text" 
+                               class="form-control" 
+                               id="smsLoginCode" 
+                               placeholder="请输入6位验证码"
+                               pattern="[0-9]{6}"
+                               maxlength="6"
+                               autocomplete="one-time-code"
+                               required>
+                        <button type="button" class="btn btn-outline-primary send-code-btn" onclick="sendSmsCode('LOGIN')">
+                            <span class="send-code-text">发送验证码</span>
+                            <span class="send-code-countdown" style="display: none;">60s</span>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="button" class="btn-login" onclick="handleSmsLogin()">
+                    <span class="btn-text">登录</span>
+                    <span class="btn-loading">
+                        <i class="fas fa-spinner fa-spin"></i> 登录中...
+                    </span>
+                </button>
+            </form>
+            
+            <!-- 其他登录方式 -->
+            <div class="other-login-options">
+                <div class="other-login-title">其他登录方式</div>
+                <div class="other-login-buttons">
+                    <button class="other-login-btn wechat" onclick="wechatLogin()">
+                        <i class="fab fa-weixin"></i>
+                        <span>微信登录</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- 底部链接 -->
+            <div class="login-footer">
+                <p>还没有账户？ <a href="#" onclick="showRegisterModal()">立即注册</a></p>
+                <p><a href="#" onclick="showForgotPasswordModal()">忘记密码？</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 注册模态框 -->
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="registerModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="registerModalLabel">
+                        <i class="fas fa-user-plus"></i> 用户注册
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="registerForm">
+                        <div class="form-group mb-3">
+                            <label for="registerPhone" class="form-label">手机号 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </span>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="registerPhone" 
+                                       placeholder="请输入11位手机号"
+                                       autocomplete="tel"
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="registerEmail" class="form-label">邮箱地址 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                <input type="email" 
+                                       class="form-control" 
+                                       id="registerEmail" 
+                                       placeholder="请输入邮箱地址"
+                                       autocomplete="email"
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="registerPassword" class="form-label">密码 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="registerPassword" 
+                                       placeholder="请输入密码（至少6位）"
+                                       minlength="6"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" class="btn password-toggle" onclick="togglePassword('registerPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="confirmPassword" class="form-label">确认密码 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="confirmPassword" 
+                                       placeholder="请再次输入密码"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" class="btn password-toggle" onclick="togglePassword('confirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                            <label class="form-check-label" for="agreeTerms">
+                                我已阅读并同意 <a href="#" class="text-primary">服务条款</a> 和 <a href="#" class="text-primary">隐私政策</a>
+                            </label>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="handleRegister()">
+                        <span class="btn-text">注册</span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> 注册中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 忘记密码模态框 -->
+    <div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="forgotPasswordModalLabel">
+                        <i class="fas fa-key"></i> 重置密码
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="forgotPasswordForm">
+                        <div class="form-group mb-3">
+                            <label for="resetPhone" class="form-label">手机号 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-mobile-alt"></i>
+                                </span>
+                                <input type="tel" 
+                                       class="form-control" 
+                                       id="resetPhone" 
+                                       placeholder="请输入11位手机号"
+                                       autocomplete="tel"
+                                       required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="resetCode" class="form-label">验证码 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-key"></i>
+                                </span>
+                                <input type="text" 
+                                       class="form-control" 
+                                       id="resetCode" 
+                                       placeholder="请输入6位验证码"
+                                       pattern="[0-9]{6}"
+                                       maxlength="6"
+                                       autocomplete="one-time-code"
+                                       required>
+                                <button type="button" class="btn btn-outline-primary send-code-btn" onclick="sendSmsCode('RESET_PASSWORD')">
+                                    <span class="send-code-text">发送验证码</span>
+                                    <span class="send-code-countdown" style="display: none;">60s</span>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="newPassword" class="form-label">新密码 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="newPassword" 
+                                       placeholder="请输入新密码（至少6位）"
+                                       minlength="6"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" class="btn password-toggle" onclick="togglePassword('newPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group mb-3">
+                            <label for="confirmNewPassword" class="form-label">确认新密码 *</label>
+                            <div class="input-group">
+                                <span class="input-group-text">
+                                    <i class="fas fa-lock"></i>
+                                </span>
+                                <input type="password" 
+                                       class="form-control" 
+                                       id="confirmNewPassword" 
+                                       placeholder="请再次输入新密码"
+                                       autocomplete="new-password"
+                                       required>
+                                <button type="button" class="btn password-toggle" onclick="togglePassword('confirmNewPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="handleResetPassword()">
+                        <span class="btn-text">重置密码</span>
+                        <span class="btn-loading" style="display: none;">
+                            <i class="fas fa-spinner fa-spin"></i> 重置中...
+                        </span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 消息提示 -->
+    <div id="messageContainer" class="message-container">
+        <div id="messageBox" class="message-box" style="display: none;">
+            <div class="message-icon">
+                <i id="messageIcon" class="fas fa-info-circle"></i>
+            </div>
+            <div class="message-content">
+                <h4 id="messageTitle" class="message-title">消息</h4>
+                <p id="messageText" class="message-text">这是一条消息</p>
+            </div>
+            <button type="button" class="message-close" onclick="hideMessage()">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- 加载遮罩 -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">加载中...</span>
+            </div>
+            <p class="mt-3 mb-0">请稍候...</p>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+    <script>
+        // 登录页面专用脚本
+        function switchLoginTab(tab) {
+            // 更新标签状态
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // 更新表单显示
+            document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+            
+            if (tab === 'password') {
+                document.getElementById('passwordLoginForm').classList.add('active');
+            } else {
+                document.getElementById('smsLoginForm').classList.add('active');
+            }
+        }
+
+        // 页面加载完成后检查登录状态
+        document.addEventListener('DOMContentLoaded', function() {
+            const authToken = localStorage.getItem('authToken');
+            if (authToken) {
+                // 已登录，跳转到首页
+                window.location.href = 'index.html';
+            }
+        });
+
+        // 添加键盘事件支持
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Enter') {
+                const activeForm = document.querySelector('.login-form.active');
+                if (activeForm) {
+                    const submitBtn = activeForm.querySelector('.btn-login');
+                    if (submitBtn && !submitBtn.disabled) {
+                        submitBtn.click();
+                    }
+                }
+            }
+        });
+
+        // 添加表单自动完成支持
+        document.addEventListener('DOMContentLoaded', function() {
+            // 自动聚焦到第一个输入框
+            setTimeout(() => {
+                const firstInput = document.querySelector('.login-form.active input:first-of-type');
+                if (firstInput) {
+                    firstInput.focus();
+                }
+            }, 100);
+        });
+    </script>
+</body>
+</html> 

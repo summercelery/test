@@ -19,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.persistence.Column;
+import org.hibernate.annotations.Type;
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -101,8 +104,8 @@ public class AuthService {
     /**
      * 发送短信验证码
      */
-    public boolean sendSmsCode(SendSmsRequest sendSmsRequest) {
-        return smsService.sendVerificationCode(sendSmsRequest.getPhoneNumber(), sendSmsRequest.getSmsType());
+    public void sendSmsCode(SendSmsRequest sendSmsRequest) {
+        smsService.sendVerificationCode(sendSmsRequest.getPhoneNumber(), sendSmsRequest.getSmsType());
     }
 
     /**

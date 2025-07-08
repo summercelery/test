@@ -1,6 +1,7 @@
 package com.example.service;
 
 import com.example.dto.WechatUserInfo;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -8,16 +9,133 @@ import org.springframework.web.client.RestTemplate;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 微信服务类
+ */
+@Slf4j
 @Service
 public class WechatService {
 
-    @Value("${wechat.app.id:}")
+    @Value("${wechat.app-id}")
     private String appId;
 
-    @Value("${wechat.app.secret:}")
+    @Value("${wechat.app-secret}")
     private String appSecret;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private String accessToken;
+    private long accessTokenExpireTime;
+
+    /**
+     * 刷新Access Token
+     */
+    public String refreshAccessToken() {
+        try {
+            String url = String.format(
+                "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=%s&secret=%s",
+                appId, appSecret
+            );
+
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+            
+            if (response != null && response.containsKey("access_token")) {
+                this.accessToken = (String) response.get("access_token");
+                int expiresIn = (Integer) response.get("expires_in");
+                this.accessTokenExpireTime = System.currentTimeMillis() + (expiresIn - 300) * 1000L; // 提前5分钟过期
+                
+                log.info("微信Access Token刷新成功");
+                return this.accessToken;
+            } else {
+                log.error("微信Access Token刷新失败: {}", response);
+                throw new RuntimeException("获取微信Access Token失败");
+            }
+        } catch (Exception e) {
+            log.error("刷新微信Access Token异常", e);
+            throw new RuntimeException("刷新微信Access Token失败", e);
+        }
+    }
+
+    /**
+     * 获取Access Token
+     */
+    public String getAccessToken() {
+        if (accessToken == null || System.currentTimeMillis() >= accessTokenExpireTime) {
+            return refreshAccessToken();
+        }
+        return accessToken;
+    }
+
+    /**
+     * 发送微信消息
+     */
+    public void sendMessage(String openid, String message) {
+        try {
+            String accessToken = getAccessToken();
+            String url = String.format(
+                "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=%s",
+                accessToken
+            );
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("touser", openid);
+            requestBody.put("msgtype", "text");
+            
+            Map<String, String> text = new HashMap<>();
+            text.put("content", message);
+            requestBody.put("text", text);
+
+            Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
+            
+            if (response != null && response.containsKey("errcode")) {
+                int errcode = (Integer) response.get("errcode");
+                if (errcode != 0) {
+                    log.error("发送微信消息失败: {}", response);
+                    throw new RuntimeException("发送微信消息失败");
+                }
+            }
+            
+            log.info("微信消息发送成功: {}", openid);
+        } catch (Exception e) {
+            log.error("发送微信消息异常", e);
+            throw new RuntimeException("发送微信消息失败", e);
+        }
+    }
+
+    /**
+     * 生成二维码
+     */
+    public String generateQRCode(String scene, int expireSeconds) {
+        try {
+            String accessToken = getAccessToken();
+            String url = String.format(
+                "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=%s",
+                accessToken
+            );
+
+            Map<String, Object> requestBody = new HashMap<>();
+            requestBody.put("expire_seconds", expireSeconds);
+            requestBody.put("action_name", "QR_SCENE");
+            
+            Map<String, Object> actionInfo = new HashMap<>();
+            Map<String, Object> sceneInfo = new HashMap<>();
+            sceneInfo.put("scene_id", scene);
+            actionInfo.put("scene", sceneInfo);
+            requestBody.put("action_info", actionInfo);
+
+            Map<String, Object> response = restTemplate.postForObject(url, requestBody, Map.class);
+            
+            if (response != null && response.containsKey("ticket")) {
+                String ticket = (String) response.get("ticket");
+                return String.format("https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=%s", ticket);
+            } else {
+                log.error("生成微信二维码失败: {}", response);
+                throw new RuntimeException("生成微信二维码失败");
+            }
+        } catch (Exception e) {
+            log.error("生成微信二维码异常", e);
+            throw new RuntimeException("生成微信二维码失败", e);
+        }
+    }
 
     /**
      * 通过授权码获取微信用户信息

@@ -814,6 +814,48 @@ body {
         flex-direction: column;
         gap: 10px;
     }
+    
+    /* 登录方式按钮移动端优化 */
+    .login-methods {
+        flex-direction: column;
+        gap: 0.8rem;
+    }
+    
+    .login-method-btn {
+        width: 100%;
+        justify-content: center;
+        padding: 12px 20px;
+    }
+    
+    /* 模态框移动端优化 */
+    .modal-dialog {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    /* 输入组移动端优化 */
+    .input-group {
+        flex-direction: column;
+    }
+    
+    .input-group .form-control {
+        border-radius: 8px 8px 0 0;
+        border-bottom: none;
+    }
+    
+    .input-group .input-group-text {
+        border-radius: 0 0 8px 8px;
+        border-top: none;
+    }
+    
+    .input-group .btn {
+        border-radius: 8px;
+        margin-top: 8px;
+    }
 }
 
 @media (max-width: 480px) {
@@ -836,6 +878,111 @@ body {
     
     .auth-header h2 {
         font-size: 24px;
+    }
+    
+    /* 导航栏移动端优化 */
+    .dashboard-nav {
+        flex-direction: column;
+        gap: 15px;
+        padding: 15px;
+    }
+    
+    .nav-brand {
+        font-size: 16px;
+    }
+    
+    .nav-user {
+        flex-direction: row;
+        justify-content: space-between;
+        width: 100%;
+    }
+    
+    /* 表单移动端优化 */
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-control {
+        font-size: 16px; /* 防止iOS缩放 */
+        padding: 12px 15px;
+    }
+    
+    /* 按钮移动端优化 */
+    .btn {
+        padding: 12px 20px;
+        font-size: 16px;
+        min-height: 44px; /* 触摸友好 */
+    }
+    
+    /* 卡片移动端优化 */
+    .dashboard-card {
+        padding: 20px;
+    }
+    
+    .card-icon {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .card-icon i {
+        font-size: 24px;
+    }
+    
+    /* 模态框移动端优化 */
+    .modal-content {
+        border-radius: 12px;
+    }
+    
+    .modal-header {
+        padding: 15px 20px;
+    }
+    
+    .modal-body {
+        padding: 20px;
+    }
+    
+    .modal-footer {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .modal-footer .btn {
+        width: 100%;
+    }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 360px) {
+    .auth-card {
+        padding: 20px 15px;
+    }
+    
+    .auth-header h2 {
+        font-size: 22px;
+    }
+    
+    .auth-header p {
+        font-size: 14px;
+    }
+    
+    .logo {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .logo i {
+        font-size: 24px;
+    }
+    
+    .form-control {
+        font-size: 16px;
+        padding: 10px 12px;
+    }
+    
+    .btn {
+        padding: 10px 16px;
+        font-size: 14px;
     }
 }
 
@@ -1098,4 +1245,965 @@ body {
     .message-text {
         font-size: 13px;
     }
+}
+
+/* 提醒管理样式 */
+.reminders-section {
+    margin-top: 2rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 20px;
+    padding: 2rem;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.reminders-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(102, 126, 234, 0.1);
+}
+
+.reminders-header h3 {
+    color: #333;
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+}
+
+.reminders-header h3 i {
+    color: #667eea;
+    margin-right: 10px;
+}
+
+.reminders-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.stat-card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+    transition: transform 0.3s ease;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+}
+
+.stat-icon i {
+    font-size: 20px;
+}
+
+.stat-content h4 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 5px 0;
+}
+
+.stat-content p {
+    font-size: 14px;
+    margin: 0;
+    opacity: 0.9;
+}
+
+.reminders-list {
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 15px;
+    padding: 1.5rem;
+}
+
+.list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.list-header h4 {
+    color: #333;
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+}
+
+.list-filters {
+    display: flex;
+    gap: 1rem;
+}
+
+.reminders-container {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.reminder-item {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border-left: 4px solid #667eea;
+    transition: all 0.3s ease;
+}
+
+.reminder-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.reminder-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.reminder-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.reminder-status {
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.reminder-status.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.reminder-status.sent {
+    background: #d4edda;
+    color: #155724;
+}
+
+.reminder-status.cancelled {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.reminder-content {
+    color: #666;
+    margin-bottom: 1rem;
+    line-height: 1.5;
+}
+
+.reminder-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.reminder-detail {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    color: #666;
+}
+
+.reminder-detail i {
+    margin-right: 8px;
+    color: #667eea;
+    width: 16px;
+}
+
+.reminder-recipients {
+    background: rgba(102, 126, 234, 0.1);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+}
+
+.reminder-recipients h6 {
+    color: #333;
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.recipient-tag {
+    display: inline-block;
+    background: #667eea;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 15px;
+    font-size: 12px;
+    margin: 2px;
+}
+
+.reminder-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.reminder-actions .btn {
+    font-size: 12px;
+    padding: 6px 12px;
+}
+
+/* 创建提醒模态框样式 */
+.recipients-section {
+    border-top: 1px solid #dee2e6;
+    padding-top: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.recipients-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: #333;
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.quick-add-recipients {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 1rem;
+}
+
+.quick-add-recipients .input-group {
+    margin-bottom: 0.5rem;
+}
+
+.quick-add-recipients .btn {
+    white-space: nowrap;
+}
+
+.recipients-title i {
+    color: #667eea;
+    margin-right: 8px;
+}
+
+.recipients-list {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.recipient-item {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.recipient-info {
+    flex: 1;
+}
+
+.recipient-name {
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 4px;
+}
+
+.recipient-contact {
+    font-size: 14px;
+    color: #666;
+}
+
+.recipient-type {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-left: 8px;
+}
+
+.recipient-type.sms {
+    background: #d4edda;
+    color: #155724;
+}
+
+.recipient-type.wechat {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.recipient-type.phone {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.recipient-actions {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.recipient-actions .btn {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .reminders-stats {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+    }
+    
+    .reminder-details {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .list-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: stretch;
+    }
+    
+    .list-filters {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .list-filters .form-select,
+    .list-filters .form-control {
+        width: 100%;
+    }
+    
+    .reminders-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 20px;
+    }
+    
+    .reminders-header h3 {
+        font-size: 24px;
+    }
+    
+    /* 提醒项移动端优化 */
+    .reminder-item {
+        padding: 15px;
+    }
+    
+    .reminder-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .reminder-title {
+        font-size: 16px;
+    }
+    
+    .reminder-status {
+        align-self: flex-start;
+    }
+    
+    .reminder-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    
+    .reminder-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* 接收者移动端优化 */
+    .recipient-item {
+        padding: 15px;
+    }
+    
+    .recipient-info .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .recipient-info .col-md-3,
+    .recipient-info .col-md-4,
+    .recipient-info .col-md-2 {
+        width: 100%;
+    }
+    
+    /* 提醒人管理移动端优化 */
+    .contacts-main {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .contacts-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+    }
+    
+    .contacts-filters .row {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .contacts-filters .col-md-4 {
+        width: 100%;
+    }
+    
+    .contact-header {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .contact-actions {
+        flex-direction: column;
+        gap: 8px;
+        margin-top: 15px;
+    }
+    
+    .contact-actions .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* 标签管理移动端优化 */
+    .tags-sidebar {
+        order: -1;
+    }
+    
+    .sidebar-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .tag-item {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .tag-actions {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .reminders-stats {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+    
+    .stat-card {
+        padding: 15px;
+    }
+    
+    .stat-content h4 {
+        font-size: 24px;
+    }
+    
+    .stat-content p {
+        font-size: 14px;
+    }
+    
+    .reminder-header {
+        flex-direction: column;
+        gap: 10px;
+        text-align: center;
+    }
+    
+    .reminder-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    
+    .reminder-actions .btn {
+        width: 100%;
+        padding: 10px;
+        font-size: 14px;
+    }
+    
+    /* 模态框移动端优化 */
+    .modal-dialog.modal-lg {
+        margin: 10px;
+        max-width: calc(100% - 20px);
+    }
+    
+    .modal-body {
+        padding: 15px;
+    }
+    
+    .modal-body .row {
+        flex-direction: column;
+    }
+    
+    .modal-body .col-md-6 {
+        width: 100%;
+    }
+    
+    /* 接收者部分移动端优化 */
+    .recipients-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .recipients-header .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    /* 联系方式管理移动端优化 */
+    .contact-methods {
+        padding: 15px;
+    }
+    
+    .contact-method-item {
+        padding: 15px;
+    }
+    
+    .contact-input-group {
+        flex-direction: column;
+    }
+    
+    .contact-input-group .form-control {
+        border-radius: 8px 8px 0 0;
+        border-bottom: none;
+    }
+    
+    .contact-input-group .input-group-text {
+        border-radius: 0 0 8px 8px;
+        border-top: none;
+    }
+    
+    .contact-input-group .btn {
+        border-radius: 8px;
+        margin-top: 8px;
+        width: 100%;
+    }
+}
+
+/* 微信扫码样式 */
+.qr-code-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px dashed #dee2e6;
+}
+
+.qr-code-placeholder {
+    text-align: center;
+    color: #6c757d;
+}
+
+.qr-code-placeholder i {
+    margin-bottom: 10px;
+}
+
+.qr-code-image {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-input-group {
+    position: relative;
+}
+
+.contact-input-group .input-group-text {
+    background: #f8f9fa;
+    border-right: none;
+}
+
+.contact-input-group .form-control {
+    border-left: none;
+}
+
+.contact-input-group .form-control:focus {
+    border-color: #ced4da;
+    box-shadow: none;
+}
+
+.contact-input-group .input-group-text {
+    border-color: #ced4da;
+}
+
+.contact-input-group .form-control:focus + .input-group-text {
+    border-color: #80bdff;
+}
+
+/* 提醒人管理样式 */
+.contacts-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.contacts-header h6 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.contacts-filters {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+}
+
+.contacts-list {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.contact-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.contact-item:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transform: translateY(-1px);
+}
+
+.contact-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.5rem;
+}
+
+.contact-name {
+    font-weight: 600;
+    color: #333;
+    margin: 0;
+}
+
+.contact-type {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.contact-type.sms {
+    background: #d4edda;
+    color: #155724;
+}
+
+.contact-type.wechat {
+    background: #d1ecf1;
+    color: #0c5460;
+}
+
+.contact-type.phone {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.contact-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    font-size: 14px;
+    color: #666;
+}
+
+.contact-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
+}
+
+.contact-tag {
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+    color: white;
+    background: #007bff;
+}
+
+.contact-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+}
+
+.contact-actions .btn {
+    font-size: 12px;
+    padding: 4px 8px;
+}
+
+/* 标签管理样式 */
+.tags-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.tags-header h6 {
+    margin: 0;
+    color: #333;
+    font-weight: 600;
+}
+
+.tags-list {
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.tag-item {
+    background: white;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.tag-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tag-color {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.tag-name {
+    font-weight: 600;
+    color: #333;
+    font-size: 14px;
+}
+
+.tag-count {
+    background: #6c757d;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 11px;
+}
+
+.tag-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.tag-actions .btn {
+    font-size: 11px;
+    padding: 2px 6px;
+}
+
+/* 标签输入样式 */
+.tags-input-container {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 0.5rem;
+    background: #f8f9fa;
+}
+
+.selected-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+    min-height: 32px;
+}
+
+.selected-tag {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    color: white;
+    background: #007bff;
+}
+
+.selected-tag .remove-tag {
+    cursor: pointer;
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+.selected-tag .remove-tag:hover {
+    opacity: 1;
+}
+
+.tags-input-group {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.tags-input-group .form-control {
+    flex: 1;
+}
+
+/* 可用标签选择样式 */
+.available-tags {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.available-tag {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.available-tag:hover {
+    background: #f8f9fa;
+}
+
+.available-tag.selected {
+    background: #e3f2fd;
+    border-color: #2196f3;
+}
+
+.available-tag input[type="checkbox"] {
+    margin-right: 0.5rem;
+}
+
+/* 用户名称点击样式 */
+.user-name {
+    transition: all 0.3s ease;
+}
+
+.user-name:hover {
+    color: #fff !important;
+    opacity: 0.8;
+}
+
+/* 联系方式管理样式 */
+.contact-methods {
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    padding: 1rem;
+    background: #f8f9fa;
+}
+
+.contact-method-item {
+    margin-bottom: 1rem;
+    padding: 0.75rem;
+    border: 1px solid #e9ecef;
+    border-radius: 6px;
+    background: white;
+}
+
+.contact-method-item:last-child {
+    margin-bottom: 0;
+}
+
+.contact-method-item .form-check {
+    margin-bottom: 0;
+}
+
+.contact-method-item .form-check-label {
+    font-weight: 600;
+    color: #333;
+    cursor: pointer;
+}
+
+.contact-method-item .form-check-label i {
+    margin-right: 0.5rem;
+    color: #007bff;
+}
+
+.contact-method-item .contact-input-group {
+    margin-top: 0.5rem;
+}
+
+/* 提醒人显示样式更新 */
+.contact-methods-display {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.contact-method-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+}
+
+.contact-method-badge.phone {
+    background: #28a745;
+}
+
+.contact-method-badge.wechat {
+    background: #17a2b8;
+}
+
+.contact-method-badge.telephone {
+    background: #ffc107;
+    color: #212529;
 } 
