@@ -41,7 +41,15 @@ public class UserService {
 
     public User findByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("用户不存在"));
+                .orElse(null);
+    }
+    
+    public java.util.List<User> findAll() {
+        return userRepository.findAll();
+    }
+    
+    public User save(User user) {
+        return userRepository.save(user);
     }
 
     public User findByPhoneNumber(String phoneNumber) {
@@ -81,6 +89,10 @@ public class UserService {
         user.setWechatUnionid(wechatUserInfo.getUnionid());
         user.setRole(User.Role.USER);
         
+        return userRepository.save(user);
+    }
+
+    public User updateUserProfile(User user) {
         return userRepository.save(user);
     }
 } 

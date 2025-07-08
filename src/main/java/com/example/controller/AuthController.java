@@ -10,16 +10,19 @@ import com.example.dto.ResetPasswordRequest;
 import com.example.dto.WechatLoginRequest;
 import com.example.service.AuthService;
 import com.example.service.RedisService;
+import com.example.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin(origins = "*")
+@CrossOrigin(originPatterns = {"http://localhost:*", "http://127.0.0.1:*", "https://localhost:*", "https://127.0.0.1:*"}, allowCredentials = "true")
 public class AuthController {
 
     @Autowired
@@ -27,6 +30,9 @@ public class AuthController {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private CaptchaService captchaService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
@@ -75,17 +81,37 @@ public class AuthController {
     }
 
     /**
+     * 获取图形验证码
+     */
+    @GetMapping("/captcha")
+    public ResponseEntity<ApiResponse<Map<String, String>>> getCaptcha() {
+        try {
+            CaptchaService.CaptchaResult captchaResult = captchaService.generateCaptcha();
+            Map<String, String> result = new HashMap<>();
+            result.put("captchaId", captchaResult.getCaptchaId());
+            result.put("imageBase64", captchaResult.getImageBase64());
+            return ResponseEntity.ok(ApiResponse.success("获取验证码成功", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("获取验证码失败: " + e.getMessage()));
+        }
+    }
+
+    /**
      * 发送短信验证码
      */
     @PostMapping("/send-sms")
-    public ResponseEntity<ApiResponse<String>> sendSmsCode(@Valid @RequestBody SendSmsRequest sendSmsRequest) {
+    public ResponseEntity<ApiResponse<String>> sendSmsCode(@Valid @RequestBody SendSmsRequest sendSmsRequest, HttpServletRequest request) {
         try {
-            boolean success = authService.sendSmsCode(sendSmsRequest);
-            if (success) {
-                return ResponseEntity.ok(ApiResponse.success("验证码发送成功", null));
-            } else {
-                return ResponseEntity.badRequest().body(ApiResponse.error("验证码发送失败，请稍后重试"));
+            // 如果提供了图形验证码ID，则验证图形验证码
+            if (sendSmsRequest.getCaptchaId() != null && !sendSmsRequest.getCaptchaId().isEmpty()) {
+                if (!captchaService.verifyCaptcha(sendSmsRequest.getCaptchaId(), sendSmsRequest.getCaptchaCode())) {
+                    return ResponseEntity.badRequest().body(ApiResponse.error("图形验证码错误"));
+                }
             }
+            // 如果没有提供图形验证码ID，则跳过验证（向后兼容）
+            
+            authService.sendSmsCode(sendSmsRequest, request);
+            return ResponseEntity.ok(ApiResponse.success("验证码发送成功", "验证码已发送至您的手机"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
@@ -144,6 +170,41 @@ public class AuthController {
             return ResponseEntity.ok(ApiResponse.success("获取微信授权URL成功", authUrl));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 验证token有效性
+     */
+    @GetMapping("/validate")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> validateToken(HttpServletRequest request) {
+        try {
+            String token = extractTokenFromRequest(request);
+            if (token == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("未找到有效的token"));
+            }
+
+            // 检查token是否在Redis中存在
+            boolean isValid = redisService.isTokenExists(token);
+            if (!isValid) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("Token已过期或无效"));
+            }
+
+            // 获取用户会话信息
+            com.example.dto.UserSession userSession = redisService.getUserSession(token);
+            if (userSession == null) {
+                return ResponseEntity.badRequest().body(ApiResponse.error("会话已过期"));
+            }
+
+            // 返回验证结果和用户信息
+            Map<String, Object> result = new HashMap<>();
+            result.put("valid", true);
+            result.put("user", userSession);
+            result.put("expireTime", redisService.getSessionExpireTime(token));
+
+            return ResponseEntity.ok(ApiResponse.success("Token验证成功", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("Token验证失败: " + e.getMessage()));
         }
     }
 } 

@@ -19,6 +19,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.persistence.Column;
+import org.hibernate.annotations.Type;
+import java.util.List;
 
 @Service
 public class AuthService {
@@ -90,10 +93,31 @@ public class AuthService {
     }
 
     public AuthResponse register(RegisterRequest registerRequest) {
+        // 验证短信验证码
+//        if (!smsService.verifyCode(registerRequest.getPhoneNumber(), registerRequest.getVerificationCode(), "REGISTER")) {
+//            throw new RuntimeException("验证码错误或已过期");
+//        }
+        
         User user = userService.registerUser(registerRequest);
         
         UserDetails userDetails = user;
         String token = jwtTokenUtil.generateToken(userDetails);
+        
+        // 创建用户会话信息
+        UserSession userSession = new UserSession(
+                user.getId().toString(),
+                user.getUsername(),
+                user.getRole().name(),
+                token
+        );
+        
+        // 设置额外信息
+        userSession.setPhoneNumber(user.getPhoneNumber());
+        userSession.setEmail(user.getEmail());
+        userSession.setFullName(user.getFullName());
+        
+        // 存储到Redis
+        redisService.storeUserSession(token, userSession);
         
         return new AuthResponse(token, user.getUsername(), user.getRole().name());
     }
@@ -101,8 +125,15 @@ public class AuthService {
     /**
      * 发送短信验证码
      */
-    public boolean sendSmsCode(SendSmsRequest sendSmsRequest) {
-        return smsService.sendVerificationCode(sendSmsRequest.getPhoneNumber(), sendSmsRequest.getSmsType());
+    public void sendSmsCode(SendSmsRequest sendSmsRequest, HttpServletRequest request) {
+        String ipAddress = getClientIpAddress(request);
+        
+        // 检查异常发送行为
+        if (smsService.checkAbnormalBehavior(sendSmsRequest.getPhoneNumber(), ipAddress)) {
+            throw new RuntimeException("检测到异常发送行为，请稍后再试");
+        }
+        
+        smsService.sendVerificationCode(sendSmsRequest.getPhoneNumber(), sendSmsRequest.getSmsType(), ipAddress);
     }
 
     /**

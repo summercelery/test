@@ -1,280 +1,238 @@
-# 用户认证系统
+# 智能提醒系统前端
 
-这是一个基于Spring Boot的用户认证系统，提供用户注册、登录等功能。
+一个基于 Vue 3 的现代化智能提醒系统前端应用，提供优雅的用户界面和完整的提醒管理功能。
 
-## 技术栈
+## ✨ 特性
 
-### 后端
-- Spring Boot 2.7.14
-- Spring Security
-- Spring Data JPA
-- Spring Data Redis
-- JWT (JSON Web Token)
-- H2 Database / MySQL
-- Maven
-- Lombok
+- 🎨 **现代化设计** - 基于 Element Plus 的优雅界面设计
+- 📱 **响应式布局** - 完美适配桌面和移动端
+- 🌙 **主题切换** - 支持明暗主题切换
+- 🔐 **完整认证** - 支持多种登录方式（账号密码、短信验证码）
+- 📊 **数据可视化** - ECharts 图表展示统计数据
+- 🔔 **提醒管理** - 完整的提醒创建、编辑和管理功能
+- 👥 **联系人管理** - 便捷的联系人管理和标签分类
+- ⚡ **高性能** - Vite 构建工具，开发体验更佳
 
-### 前端
-- HTML5 / CSS3 / JavaScript
-- Bootstrap 5
-- Font Awesome
-- 响应式设计
+## 🛠️ 技术栈
 
-### 部署
-- Docker
-- Docker Compose
-- Nginx
+- **前端框架**: Vue 3 + Composition API
+- **UI 组件库**: Element Plus
+- **状态管理**: Pinia
+- **路由管理**: Vue Router 4
+- **HTTP 客户端**: Axios
+- **图表库**: ECharts + Vue-ECharts
+- **构建工具**: Vite
+- **样式处理**: SCSS
+- **日期处理**: Day.js
 
-## 功能特性
+## 📋 系统要求
 
-- ✅ 用户注册和登录
-- ✅ JWT Token认证
-- ✅ 用户信息管理
-- ✅ 密码加密存储
-- ✅ 全局异常处理
-- ✅ 跨域支持
-- ✅ Redis会话管理
-- ✅ 会话统计和监控
-- ✅ 邮箱注册支持
-- ✅ 短信验证码登录
-- ✅ 忘记密码重置
-- ✅ 微信登录
-- ✅ 美观的前端界面
-- ✅ 响应式设计
-- ✅ 实时消息提示
+- Node.js >= 16.0.0
+- npm >= 8.0.0
 
-## 项目结构
+## 🚀 快速开始
 
-```
-src/main/java/com/example/
-├── UserAuthApplication.java          # 主应用程序类
-├── config/
-│   └── SecurityConfig.java          # 安全配置
-├── controller/
-│   ├── AuthController.java          # 认证控制器
-│   └── UserController.java          # 用户控制器
-├── dto/
-│   ├── ApiResponse.java             # 通用API响应
-│   ├── AuthResponse.java            # 认证响应
-│   ├── LoginRequest.java            # 登录请求
-│   └── RegisterRequest.java         # 注册请求
-├── entity/
-│   └── User.java                    # 用户实体
-├── exception/
-│   └── GlobalExceptionHandler.java  # 全局异常处理器
-├── repository/
-│   └── UserRepository.java          # 用户数据访问层
-├── security/
-│   ├── CustomUserDetailsService.java # 自定义用户详情服务
-│   ├── JwtRequestFilter.java        # JWT请求过滤器
-│   └── JwtTokenUtil.java            # JWT工具类
-└── service/
-    ├── AuthService.java             # 认证服务
-    └── UserService.java             # 用户服务
-```
-
-## 快速开始
-
-### 1. 环境要求
-
-- JDK 8+
-- Maven 3.6+
-
-### 2. 运行项目
+### 1. 克隆项目
 
 ```bash
-# 克隆项目
 git clone <repository-url>
-cd user-auth-system
-
-# 编译项目
-mvn clean compile
-
-# 运行项目
-mvn spring-boot:run
+cd reminder-frontend
 ```
 
-### 3. 访问应用
-
-- 应用地址: http://localhost:8080
-- H2数据库控制台: http://localhost:8080/h2-console
-  - JDBC URL: `jdbc:h2:mem:testdb`
-  - 用户名: `sa`
-  - 密码: (空)
-
-## API接口
-
-### 认证接口
-
-#### 1. 用户注册
-```
-POST /api/auth/register
-Content-Type: application/json
-
-{
-    "username": "testuser",
-    "password": "123456",
-    "email": "test@example.com",
-    "fullName": "测试用户",
-    "phoneNumber": "13800138000"
-}
-```
-
-#### 2. 用户登录
-```
-POST /api/auth/login
-Content-Type: application/json
-
-{
-    "username": "testuser",
-    "password": "123456"
-}
-```
-
-#### 3. 发送短信验证码
-```
-POST /api/auth/send-sms
-Content-Type: application/json
-
-{
-    "phoneNumber": "13800138000",
-    "smsType": "LOGIN"
-}
-```
-
-#### 4. 短信验证码登录
-```
-POST /api/auth/sms-login
-Content-Type: application/json
-
-{
-    "phoneNumber": "13800138000",
-    "verificationCode": "123456"
-}
-```
-
-#### 5. 重置密码
-```
-POST /api/auth/reset-password
-Content-Type: application/json
-
-{
-    "phoneNumber": "13800138000",
-    "verificationCode": "123456",
-    "newPassword": "newpassword123",
-    "confirmPassword": "newpassword123"
-}
-```
-
-#### 6. 认证测试
-```
-GET /api/auth/test
-```
-
-#### 7. 获取微信授权URL
-```
-GET /api/auth/wechat/auth-url?redirectUri={redirectUri}&state={state}
-```
-
-#### 8. 微信登录
-```
-POST /api/auth/wechat-login
-Content-Type: application/json
-
-{
-    "code": "wechat_auth_code",
-    "state": "state_value"
-}
-```
-
-#### 9. 用户登出
-```
-POST /api/auth/logout
-Authorization: Bearer <jwt-token>
-```
-
-### 用户接口
-
-#### 1. 获取用户信息
-```
-GET /api/user/profile
-Authorization: Bearer <jwt-token>
-```
-
-#### 2. 欢迎信息
-```
-GET /api/user/hello
-Authorization: Bearer <jwt-token>
-```
-
-### 会话管理接口
-
-#### 1. 获取会话统计
-```
-GET /api/session/stats
-Authorization: Bearer <jwt-token>
-```
-
-#### 2. 延长会话
-```
-POST /api/session/extend
-Authorization: Bearer <jwt-token>
-```
-
-#### 3. 强制下线其他设备
-```
-POST /api/session/logout-others
-Authorization: Bearer <jwt-token>
-```
-
-## 响应格式
-
-所有API都返回统一的响应格式：
-
-```json
-{
-    "success": true,
-    "message": "操作成功",
-    "data": {
-        // 具体数据
-    }
-}
-```
-
-## 安全说明
-
-- 密码使用BCrypt加密存储
-- 使用JWT进行无状态认证
-- 所有用户接口都需要JWT令牌
-- 支持CORS跨域请求
-
-## 配置说明
-
-主要配置在 `application.yml` 文件中：
-
-- 数据库配置 (H2内存数据库)
-- JWT密钥和过期时间
-- 服务器端口
-- 日志级别
-
-## 开发说明
-
-### 添加新功能
-
-1. 在 `entity` 包中创建实体类
-2. 在 `repository` 包中创建数据访问层
-3. 在 `service` 包中创建业务逻辑
-4. 在 `controller` 包中创建控制器
-5. 在 `dto` 包中创建数据传输对象
-
-### 测试
-
-项目包含基本的单元测试，可以使用以下命令运行：
+### 2. 安装依赖
 
 ```bash
-mvn test
+npm install
 ```
 
-## 许可证
+### 3. 启动开发服务器
 
-MIT License 
+#### Windows 用户
+```bash
+start-dev.bat
+```
+
+#### Linux/Mac 用户
+```bash
+chmod +x start-dev.sh
+./start-dev.sh
+```
+
+#### 或者直接使用 npm
+```bash
+npm run dev
+```
+
+### 4. 访问应用
+
+打开浏览器访问: http://localhost:3000
+
+## 📦 构建部署
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 预览构建结果
+
+```bash
+npm run preview
+```
+
+## 🏗️ 项目结构
+
+```
+reminder-frontend/
+├── public/                 # 静态资源
+├── src/
+│   ├── api/               # API 接口封装
+│   │   ├── auth.js        # 认证相关接口
+│   │   ├── contacts.js    # 联系人接口
+│   │   ├── reminders.js   # 提醒接口
+│   │   ├── user.js        # 用户接口
+│   │   └── request.js     # HTTP 客户端配置
+│   ├── components/        # 公共组件
+│   │   └── Layout.vue     # 主布局组件
+│   ├── router/            # 路由配置
+│   │   └── index.js       # 路由定义
+│   ├── stores/            # 状态管理
+│   │   └── user.js        # 用户状态
+│   ├── styles/            # 样式文件
+│   │   └── index.scss     # 全局样式
+│   ├── views/             # 页面组件
+│   │   ├── auth/          # 认证相关页面
+│   │   │   ├── Login.vue  # 登录页面
+│   │   │   └── Register.vue # 注册页面
+│   │   ├── Dashboard.vue  # 仪表板
+│   │   ├── Contacts.vue   # 联系人管理
+│   │   ├── Profile.vue    # 个人设置
+│   │   └── 404.vue        # 404 页面
+│   ├── App.vue            # 根组件
+│   └── main.js            # 入口文件
+├── index.html             # HTML 模板
+├── vite.config.js         # Vite 配置
+├── package.json           # 项目配置
+├── start-dev.bat          # Windows 启动脚本
+├── start-dev.sh           # Linux/Mac 启动脚本
+└── README.md              # 项目说明
+```
+
+## 🔧 配置说明
+
+### 环境配置
+
+项目使用 Vite 的代理功能将 `/api` 请求转发到后端服务器：
+
+```javascript
+// vite.config.js
+server: {
+  port: 3000,
+  proxy: {
+    '/api': {
+      target: 'http://localhost:8080',
+      changeOrigin: true,
+      secure: false
+    }
+  }
+}
+```
+
+### API 配置
+
+所有 API 请求都通过统一的 HTTP 客户端处理，支持：
+
+- 自动添加 Authorization 头
+- 统一错误处理
+- 响应拦截器
+- 请求超时配置
+
+## 🌟 主要功能
+
+### 用户认证
+- 用户登录（账号密码 + 短信验证码）
+- 用户注册
+- 密码重置
+- 自动登录状态保持
+
+### 仪表板
+- 数据统计概览
+- 提醒状态分布图表
+- 最近提醒列表
+- 快捷操作入口
+
+### 联系人管理
+- 联系人列表展示
+- 搜索和筛选功能
+- 联系人增删改查
+- 标签分类管理
+
+### 个人设置
+- 基本信息编辑
+- 使用统计查看
+- 账户安全设置
+- 个性化偏好配置
+
+## 🎨 设计系统
+
+### 色彩方案
+- 主色调：渐变紫蓝色 (#667eea → #764ba2)
+- 辅助色：绿色、橙色、红色等语义化颜色
+- 中性色：灰色系列用于文本和背景
+
+### 组件设计
+- 卡片式布局
+- 圆角设计
+- 阴影效果
+- 渐变按钮
+- 响应式网格
+
+## 🔌 API 接口
+
+项目假设后端提供以下 API 接口：
+
+- `POST /api/auth/login` - 用户登录
+- `POST /api/auth/register` - 用户注册
+- `GET /api/contacts` - 获取联系人列表
+- `POST /api/contacts` - 创建联系人
+- `GET /api/reminders` - 获取提醒列表
+- `POST /api/reminders` - 创建提醒
+- `GET /api/user/profile` - 获取用户信息
+- `GET /api/user/stats` - 获取用户统计
+
+详细的 API 文档请参考后端项目文档。
+
+## 🤝 开发规范
+
+### 代码风格
+- 使用 ESLint 进行代码检查
+- 组件使用 PascalCase 命名
+- 文件名使用 kebab-case
+- 变量使用 camelCase
+
+### 提交规范
+```
+feat: 新功能
+fix: 修复bug
+docs: 文档更新
+style: 代码格式调整
+refactor: 代码重构
+test: 测试相关
+chore: 构建工具或依赖更新
+```
+
+## 📄 许可证
+
+MIT License
+
+## 🙋‍♂️ 联系方式
+
+如有问题或建议，请联系：
+
+- 邮箱：support@reminder.com
+- GitHub Issues：请在项目 Issues 中提交
+
+---
+
+感谢使用智能提醒系统！ 🎉 

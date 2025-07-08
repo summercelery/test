@@ -162,4 +162,40 @@ public class RedisService {
         Long expireTime = redisTemplate.getExpire(key, TimeUnit.SECONDS);
         return expireTime != null ? expireTime : 0;
     }
+
+    /**
+     * 设置键的过期时间
+     */
+    public void setExpire(String key, long expireSeconds) {
+        redisTemplate.expire(key, expireSeconds, TimeUnit.SECONDS);
+    }
+
+    /**
+     * 向列表左侧插入元素
+     */
+    public void listPush(String key, String value) {
+        redisTemplate.opsForList().leftPush(key, value);
+    }
+
+    /**
+     * 向列表右侧插入元素
+     */
+    public void listRightPush(String key, String value) {
+        redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    /**
+     * 获取列表长度
+     */
+    public long listSize(String key) {
+        Long size = redisTemplate.opsForList().size(key);
+        return size != null ? size : 0;
+    }
+
+    /**
+     * 获取列表元素
+     */
+    public java.util.List<Object> listRange(String key, long start, long end) {
+        return redisTemplate.opsForList().range(key, start, end);
+    }
 } 

@@ -1,0 +1,36 @@
+{
+  "name": "reminder-frontend",
+  "version": "1.0.0",
+  "private": true,
+  "description": "基于Vue 3的现代化提醒管理系统前端",
+  "scripts": {
+    "serve": "npx vite",
+    "build": "npx vite build",
+    "lint": "eslint src --ext .js,.vue --fix",
+    "dev": "npx vite",
+    "preview": "npx vite preview"
+  },
+  "dependencies": {
+    "@element-plus/icons-vue": "^2.1.0",
+    "axios": "^1.5.0",
+    "dayjs": "^1.11.9",
+    "element-plus": "^2.3.9",
+    "lodash": "^4.17.21",
+    "pinia": "^2.1.6",
+    "vue": "^3.3.4",
+    "vue-router": "^4.2.4"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^4.3.4",
+    "eslint": "^8.46.0",
+    "eslint-plugin-vue": "^9.17.0",
+    "sass": "^1.89.2",
+    "unplugin-auto-import": "^0.16.6",
+    "unplugin-vue-components": "^0.25.2",
+    "vite": "^4.4.9"
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  }
+}
