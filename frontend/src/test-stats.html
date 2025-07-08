@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>统计数据测试</title>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <h1>统计数据测试</h1>
+    
+    <div id="login-section">
+        <h2>登录</h2>
+        <input type="text" id="username" placeholder="用户名" value="18354226137">
+        <input type="password" id="password" placeholder="密码" value="ll4888983">
+        <button onclick="login()">登录</button>
+    </div>
+    
+    <div id="stats-section" style="display: none;">
+        <h2>统计数据</h2>
+        <button onclick="getStats()">获取统计数据</button>
+        <div id="stats-result"></div>
+    </div>
+    
+    <script>
+        let token = '';
+        
+        async function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await axios.post('/api/auth/login', {
+                    username,
+                    password
+                });
+                
+                token = response.data.data.token;
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('stats-section').style.display = 'block';
+                
+                console.log('登录成功，token:', token);
+                
+                // 自动获取统计数据
+                getStats();
+            } catch (error) {
+                console.error('登录失败:', error);
+                alert('登录失败: ' + error.message);
+            }
+        }
+        
+        async function getStats() {
+            try {
+                const response = await axios.get('/api/user/stats', {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                
+                const stats = response.data.data;
+                document.getElementById('stats-result').innerHTML = `
+                    <h3>统计结果:</h3>
+                    <p>总提醒数: ${stats.totalReminders}</p>
+                    <p>待发送: ${stats.pendingReminders}</p>
+                    <p>已发送: ${stats.sentReminders}</p>
+                    <p>已取消: ${stats.cancelledReminders}</p>
+                    <p>联系人数: ${stats.contactCount}</p>
+                    <p>标签数: ${stats.tagCount}</p>
+                `;
+                
+                console.log('统计数据:', stats);
+            } catch (error) {
+                console.error('获取统计数据失败:', error);
+                alert('获取统计数据失败: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html> 
