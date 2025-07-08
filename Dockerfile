@@ -65,6 +65,9 @@ RUN apt-get update --fix-missing && \
 # 创建非root用户
 RUN groupadd -r appuser && useradd -r -g appuser appuser
 
+# 创建日志目录
+RUN mkdir -p /app/logs && chown -R appuser:appuser /app/logs
+
 # 从构建阶段复制jar文件
 COPY --from=build /app/target/*.jar app.jar
 

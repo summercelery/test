@@ -10,6 +10,8 @@ services:
       - SPRING_DATASOURCE_URL=jdbc:mysql://localhost:3306/user_auth_system?useUnicode=true&characterEncoding=utf8&useSSL=false&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true
       - SPRING_REDIS_HOST=localhost
     restart: unless-stopped
+    volumes:
+      - ./logs:/app/logs
 
   # 前端Nginx应用 - 使用host网络
   frontend:
