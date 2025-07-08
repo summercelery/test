@@ -51,7 +51,7 @@ public interface ContactRepository extends JpaRepository<Contact, Long> {
     /**
      * 根据用户ID和姓名模糊查询
      */
-    @Query("SELECT c FROM Contact c WHERE c.userId = :userId AND c.name LIKE %:name%")
+    @Query("SELECT c FROM Contact c WHERE c.userId = :userId AND c.name LIKE CONCAT('%', :name, '%')")
     List<Contact> findByUserIdAndNameContaining(@Param("userId") Long userId, @Param("name") String name);
 
     /**

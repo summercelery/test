@@ -33,6 +33,12 @@ public interface ReminderRepository extends JpaRepository<Reminder, Long> {
     Page<Reminder> findByUserIdAndStatusOrderByCreatedAtDesc(Long userId, Reminder.ReminderStatus status, Pageable pageable);
 
     /**
+     * 根据用户ID搜索提醒（标题或内容包含关键词）
+     */
+    Page<Reminder> findByUserIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc(
+            Long userId, String title, String content, Pageable pageable);
+
+    /**
      * 查找待发送的提醒（时间已到且状态为待发送）
      */
     @Query("SELECT r FROM Reminder r WHERE r.reminderTime <= :now AND r.status = 'PENDING'")

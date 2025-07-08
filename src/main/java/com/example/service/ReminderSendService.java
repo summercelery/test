@@ -94,7 +94,8 @@ public class ReminderSendService {
      */
     private void sendSmsMessage(String phoneNumber, String message) {
         try {
-            smsService.sendMessage(phoneNumber, message);
+                smsService.sendMessage(phoneNumber, message);
+
             log.info("短信发送成功: {}", phoneNumber);
         } catch (Exception e) {
             log.error("短信发送失败: {}", phoneNumber, e);

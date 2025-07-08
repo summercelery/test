@@ -1,5 +1,6 @@
 package com.example.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,6 +37,7 @@ public class Tag {
     private LocalDateTime updatedAt;
 
     @ManyToMany(mappedBy = "tags", fetch = FetchType.LAZY)
+    @JsonIgnore  // 避免JSON序列化时的循环引用
     private List<Contact> contacts;
 
     @PrePersist

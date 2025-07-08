@@ -12,4 +12,7 @@ public class LoginRequest {
     
     @NotBlank(message = "密码不能为空")
     private String password;
+    
+    // 记住我选项
+    private Boolean remember = false;
 } 

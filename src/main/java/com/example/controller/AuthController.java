@@ -10,6 +10,7 @@ import com.example.dto.ResetPasswordRequest;
 import com.example.dto.WechatLoginRequest;
 import com.example.service.AuthService;
 import com.example.service.RedisService;
+import com.example.service.CaptchaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +30,9 @@ public class AuthController {
 
     @Autowired
     private RedisService redisService;
+
+    @Autowired
+    private CaptchaService captchaService;
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<AuthResponse>> login(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
@@ -77,16 +81,40 @@ public class AuthController {
     }
 
     /**
+     * 获取图形验证码
+     */
+    @GetMapping("/captcha")
+    public ResponseEntity<ApiResponse<Map<String, String>>> getCaptcha() {
+        try {
+            CaptchaService.CaptchaResult captchaResult = captchaService.generateCaptcha();
+            Map<String, String> result = new HashMap<>();
+            result.put("captchaId", captchaResult.getCaptchaId());
+            result.put("imageBase64", captchaResult.getImageBase64());
+            return ResponseEntity.ok(ApiResponse.success("获取验证码成功", result));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(ApiResponse.error("获取验证码失败: " + e.getMessage()));
+        }
+    }
+
+    /**
      * 发送短信验证码
      */
     @PostMapping("/send-sms")
-    public ResponseEntity<ApiResponse<String>> sendSmsCode(@Valid @RequestBody SendSmsRequest sendSmsRequest) {
+    public ResponseEntity<ApiResponse<String>> sendSmsCode(@Valid @RequestBody SendSmsRequest sendSmsRequest, HttpServletRequest request) {
         try {
-             authService.sendSmsCode(sendSmsRequest);
+            // 如果提供了图形验证码ID，则验证图形验证码
+            if (sendSmsRequest.getCaptchaId() != null && !sendSmsRequest.getCaptchaId().isEmpty()) {
+                if (!captchaService.verifyCaptcha(sendSmsRequest.getCaptchaId(), sendSmsRequest.getCaptchaCode())) {
+                    return ResponseEntity.badRequest().body(ApiResponse.error("图形验证码错误"));
+                }
+            }
+            // 如果没有提供图形验证码ID，则跳过验证（向后兼容）
+            
+            authService.sendSmsCode(sendSmsRequest, request);
+            return ResponseEntity.ok(ApiResponse.success("验证码发送成功", "验证码已发送至您的手机"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(ApiResponse.error("验证码发送失败，请稍后重试"));
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
-        return ResponseEntity.badRequest().body(ApiResponse.error("验证码发送成功"));
     }
 
     /**

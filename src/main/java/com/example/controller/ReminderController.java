@@ -56,11 +56,23 @@ public class ReminderController {
     @GetMapping
     public ResponseEntity<?> getReminders(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false) String status) {
         try {
             Long userId = SecurityUtil.getCurrentUserId();
-            Pageable pageable = PageRequest.of(page, size);
-            Page<Reminder> reminders = reminderService.getUserReminders(userId, pageable);
+            Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+            
+            Page<Reminder> reminders;
+            if (status != null && !status.isEmpty()) {
+                Reminder.ReminderStatus reminderStatus = Reminder.ReminderStatus.valueOf(status);
+                reminders = reminderService.getUserRemindersByStatus(userId, reminderStatus, pageable);
+            } else if (search != null && !search.isEmpty()) {
+                reminders = reminderService.searchUserReminders(userId, search, pageable);
+            } else {
+                reminders = reminderService.getUserReminders(userId, pageable);
+            }
+            
             Page<ReminderResponse> response = reminders.map(this::convertToResponse);
             return ResponseEntity.ok(ApiResponse.success("获取提醒列表成功", response));
         } catch (Exception e) {
@@ -85,6 +97,22 @@ public class ReminderController {
             }
         } catch (Exception e) {
             log.error("获取提醒详情失败", e);
+            return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
+        }
+    }
+
+    /**
+     * 更新提醒
+     */
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateReminder(@PathVariable Long id, @Valid @RequestBody ReminderRequest request) {
+        try {
+            Long userId = SecurityUtil.getCurrentUserId();
+            Reminder reminder = reminderService.updateReminder(userId, id, request);
+            ReminderResponse response = convertToResponse(reminder);
+            return ResponseEntity.ok(ApiResponse.success("提醒更新成功", response));
+        } catch (Exception e) {
+            log.error("更新提醒失败", e);
             return ResponseEntity.badRequest().body(ApiResponse.error(e.getMessage()));
         }
     }
@@ -190,6 +218,9 @@ public class ReminderController {
         } else {
             response.setReminderType("未设置");
         }
+        
+        // 设置业务类型
+        response.setType(reminder.getType());
         
         response.setStatus(reminder.getStatus().getDescription());
         response.setRepeatType(reminder.getRepeatType().getDescription());

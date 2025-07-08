@@ -62,6 +62,9 @@ public class ReminderService {
         // 设置提醒类型列表
         reminder.setReminderTypes(request.getReminderTypes());
         
+        // 设置业务类型
+        reminder.setType(request.getType());
+        
         reminder.setRepeatType(Reminder.RepeatType.valueOf(request.getRepeatType()));
         reminder.setRepeatEndTime(request.getRepeatEndTime());
         reminder.setStatus(Reminder.ReminderStatus.PENDING);
@@ -90,6 +93,14 @@ public class ReminderService {
      */
     public Page<Reminder> getUserRemindersByStatus(Long userId, Reminder.ReminderStatus status, Pageable pageable) {
         return reminderRepository.findByUserIdAndStatusOrderByCreatedAtDesc(userId, status, pageable);
+    }
+
+    /**
+     * 搜索用户的提醒
+     */
+    public Page<Reminder> searchUserReminders(Long userId, String searchQuery, Pageable pageable) {
+        return reminderRepository.findByUserIdAndTitleContainingOrContentContainingOrderByCreatedAtDesc(
+                userId, searchQuery, searchQuery, pageable);
     }
 
     /**
@@ -126,6 +137,9 @@ public class ReminderService {
         
         // 设置提醒类型列表
         reminder.setReminderTypes(request.getReminderTypes());
+        
+        // 设置业务类型
+        reminder.setType(request.getType());
         
         reminder.setRepeatType(Reminder.RepeatType.valueOf(request.getRepeatType()));
         reminder.setRepeatEndTime(request.getRepeatEndTime());
@@ -353,6 +367,9 @@ public class ReminderService {
         } else {
             response.setReminderType("未设置");
         }
+        
+        // 设置业务类型
+        response.setType(reminder.getType());
         
         response.setStatus(reminder.getStatus().getDescription());
         response.setRepeatType(reminder.getRepeatType().getDescription());

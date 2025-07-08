@@ -1,5 +1,6 @@
 package com.example.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -22,14 +23,18 @@ public class ReminderRequest {
     private String content;
 
     @NotNull(message = "提醒时间不能为空")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime reminderTime;
 
     @NotNull(message = "提醒类型不能为空")
     @Size(min = 1, message = "至少选择一种提醒类型")
     private List<String> reminderTypes; // WECHAT, SMS, PHONE
 
+    private String type = "OTHER"; // 提醒业务类型：BIRTHDAY, ANNIVERSARY, MEETING, TASK, OTHER
+
     private String repeatType = "NONE"; // NONE, DAILY, WEEKLY, MONTHLY
 
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime repeatEndTime;
 
     @NotNull(message = "接收者不能为空")

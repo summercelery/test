@@ -1,8 +1,10 @@
 package com.example.entity;
 
+import com.vladmihalcea.hibernate.type.json.JsonStringType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.hibernate.annotations.Type;
+import org.hibernate.annotations.TypeDef;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -14,6 +16,7 @@ import java.util.List;
 /**
  * 提醒实体类
  */
+@TypeDef(name = "json", typeClass = JsonStringType.class)
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Entity
@@ -37,9 +40,12 @@ public class Reminder {
     @Column(name = "reminder_time", nullable = false)
     private LocalDateTime reminderTime; // 提醒时间
 
-    @Column(name = "reminder_types", columnDefinition = "JSON")
     @Type(type = "json")
+    @Column(name = "reminder_types", columnDefinition = "JSON")
     private List<String> reminderTypes; // WECHAT, SMS, PHONE
+
+    @Column(name = "type", length = 50)
+    private String type = "OTHER"; // 业务类型：BIRTHDAY, ANNIVERSARY, MEETING, TASK, OTHER
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)

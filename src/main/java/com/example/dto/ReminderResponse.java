@@ -13,6 +13,7 @@ public class ReminderResponse {
     private String content;
     private LocalDateTime reminderTime;
     private String reminderType;
+    private String type; // 业务类型：BIRTHDAY, ANNIVERSARY, MEETING, TASK, OTHER
     private String status;
     private String repeatType;
     private Integer repeatInterval;
